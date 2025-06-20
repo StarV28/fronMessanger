@@ -1,5 +1,6 @@
 <template>
-  <div class="wrapper">
+  <loader-comp v-if="authStore.loading" />
+  <div v-else class="wrapper">
     <form @submit.prevent="onSubmit" class="form">
       <h1>Log in</h1>
       <div class="form__inp">
@@ -31,20 +32,24 @@ import { useRouter } from 'vue-router'
 //========================================================================================================================================================
 const authStore = useAuthStore()
 const router = useRouter()
-
 const { handleSubmit, meta, resetForm } = useForm({
   validationSchema: loginSchema,
 })
 //========================================================================================================================================================
 const onSubmit = handleSubmit(async (values) => {
-  await authStore.login(values)
-  const user = localStorage.getItem('user')
-  if (!user) {
-    alert("Don't right password or email, please one mo time!")
+  try {
+    await authStore.login(values)
+    const user = localStorage.getItem('user')
+    if (!user) {
+      alert("Don't right password or email, please one mo time!")
+      return
+    }
+    resetForm()
+    router.push('/user')
+  } catch (err) {
+    alert('Server may be sleeping. Try again shortly.')
+    console.error('Loading Error', err)
   }
-
-  resetForm()
-  router.push('/user')
 })
 //========================================================================================================================================================
 // const loginWithGoogle = () => {

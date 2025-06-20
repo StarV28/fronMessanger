@@ -4,6 +4,14 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { onMounted } from 'vue'
+import { useWakeUpBackend } from './util/useWakeUpBackend'
+
+onMounted(() => {
+  const { pingBackend } = useWakeUpBackend()
+  pingBackend()
+})
+</script>
 
 <style lang="scss" scoped></style>

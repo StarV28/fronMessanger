@@ -1,5 +1,6 @@
 <template>
-  <div class="wrapper">
+  <loader-comp v-if="authStore.loading" />
+  <div v-else class="wrapper">
     <form @submit.prevent="onSubmit" class="form">
       <h1>Registration</h1>
       <div class="form__inp">
@@ -32,19 +33,23 @@ import { useRouter } from 'vue-router'
 //========================================================================================================================================================
 const authStore = useAuthStore()
 const router = useRouter()
-
 const { handleSubmit, meta, resetForm } = useForm({
   validationSchema: registerSchema,
 })
 //========================================================================================================================================================
 const onSubmit = handleSubmit(async (values) => {
-  await authStore.register(values)
-  if (authStore.error) {
-    alert('Error, An error occurred, please reload the page.')
-    console.log('Error of Register:', authStore.error)
+  try {
+    await authStore.register(values)
+    if (authStore.error) {
+      alert('Incorrect email or password.')
+      return
+    }
+    resetForm()
+    router.push('/user')
+  } catch (err) {
+    alert('Server may be sleeping. Try again shortly.')
+    console.error('Registration error:', err)
   }
-  resetForm()
-  router.push('/user')
 })
 </script>
 
